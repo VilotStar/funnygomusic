@@ -26,8 +26,7 @@ services:
       - "BOT_OWNER=${BOT_OWNER}"
       - "MEILI_MASTER_KEY=${MEILI_MASTER_KEY}"
     volumes:
-      - Y:\data\music:/music
-      - X:\Media\sound:/sound
+      - "${MUSIC_DIR}:/music:ro"
   db:
     image: postgres:alpine
     restart: unless-stopped
@@ -37,7 +36,7 @@ services:
       - "POSTGRES_PASSWORD=${DB_PASS}"
       - POSTGRES_USER=postgres
     volumes:
-      - Y:\data\dev\docker\pg-fgm:/var/lib/postgresql/data
+      - ./compose-data/pg-fgm:/var/lib/postgresql/data
       - ./dbinit.sql:/docker-entrypoint-initdb.d/init.sql
   meili:
     image: getmeili/meilisearch:latest
@@ -50,4 +49,4 @@ services:
     ports:
       - "7700:7700"
     volumes:
-        - Y:\data\dev\docker\meili-fgm:/meili_data
+        - ./compose-data/meili-fgm:/meili_data
