@@ -7,17 +7,8 @@ services:
       - db
       - meili
     build:
-        context: ./bot
+        context: .
         dockerfile: Dockerfile
-        additional_contexts:
-          - ./commands
-          - ./databaser
-          - ./events
-          - ./routes
-          - ./utils
-          - ./go.mod
-          - ./go.sum
-          - ./main.go
     environment:
       - "BOT_TOKEN=${BOT_TOKEN}"
       - "DB_HOST=db"
@@ -41,11 +32,10 @@ services:
   meili:
     image: getmeili/meilisearch:latest
     restart: unless-stopped
-    command:
-#      - "--http-addr"
-#      - ""
     environment:
-        - "MEILI_MASTER_KEY=${MEILI_MASTER_KEY}"
+      # - MEILI_ENV=production
+      - "MEILI_MASTER_KEY=${MEILI_MASTER_KEY}"
+      - MEILI_NO_ANALYTICS
     ports:
       - "7700:7700"
     volumes:
