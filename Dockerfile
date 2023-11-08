@@ -1,7 +1,7 @@
 FROM golang:alpine
 LABEL authors="constanna"
 
-# RUN apk add --update ffmpeg yt-dlp
+RUN apk add --update ffmpeg
 RUN wget -qO /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp
 
 WORKDIR /usr/src/funnygomusic
