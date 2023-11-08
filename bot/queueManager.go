@@ -6,6 +6,7 @@ import (
 	"github.com/diamondburned/oggreader"
 	"github.com/hako/durafmt"
 	"io"
+	"log"
 	"log/slog"
 	"math/rand"
 	"os"
@@ -150,6 +151,8 @@ func (qm *QueueManager) Start(ctx context.Context) {
 						continue
 					}
 					if qm.player == nil || qm.GetPlayingState() == PSComplete {
+						log.Println("update current playing song")
+
 						curr := *qm.GetCurrentSong()
 						qm.logger.Debug("request to play song", "index", qm.index, "song", curr)
 						qm.player = curr.GetPlayer()
@@ -180,6 +183,9 @@ func (qm *QueueManager) Start(ctx context.Context) {
 				}
 			case SongEnded:
 				{
+					if qm.GetCurrentSongTime() > (qm.GetDuration() / 2) {
+						log.Println("scrobwle song") // If scrobbling the track doesn't change the current playing, we can change it here
+					}
 					if len(qm.playlist) == 0 {
 						continue
 					}

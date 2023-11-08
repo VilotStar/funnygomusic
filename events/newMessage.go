@@ -34,6 +34,7 @@ var (
 		"idxdir":    commands.IndexDirCommand,
 		"ua":        commands.UpdateArtworksCommand,
 		"um":        commands.UpdateMeiliCommand,
+		"lastfm":    commands.LastFmCommand,
 	}
 )
 
