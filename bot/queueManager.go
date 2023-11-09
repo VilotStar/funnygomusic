@@ -3,8 +3,10 @@ package bot
 import (
 	"context"
 	"fmt"
+	"funnygomusic/databaser"
 	"github.com/diamondburned/oggreader"
 	"github.com/hako/durafmt"
+	"github.com/shkh/lastfm-go/lastfm"
 	"io"
 	"log"
 	"log/slog"
@@ -183,9 +185,6 @@ func (qm *QueueManager) Start(ctx context.Context) {
 				}
 			case SongEnded:
 				{
-					if qm.GetCurrentSongTime() > (qm.GetDuration() / 2) {
-						log.Println("scrobwle song") // If scrobbling the track doesn't change the current playing, we can change it here
-					}
 					if len(qm.playlist) == 0 {
 						continue
 					}
@@ -218,8 +217,23 @@ func (qm *QueueManager) AlertUponEnd() {
 	if err != nil {
 		return
 	}
+
 	if qm.GetPlayingState() == PSComplete {
 		qm.logger.Debug("Song ended, complete")
+		song := qm.playlist[qm.index]
+		for _, userId := range qm.b.VoiceSes.Users {
+			var user = databaser.AllowedUser{ID: uint64(userId.ID)}
+			qm.b.Db.First(&user)
+			err := qm.b.LastFmApi.LoginWithToken(user.Token)
+			if err != nil {
+				qm.logger.Warn("Failed to login with token for id: %d, username: %s", userId.ID, userId.Name)
+			}
+			track := lastfm.P{"artist": song.GetArtist(), "track": song.GetTitle()}
+			_, err = qm.b.LastFmApi.Track.Scrobble(track)
+			if err != nil {
+				qm.logger.Warn("Failed to scrobble track")
+			}
+		}
 	} else {
 		qm.logger.Debug("Song ended, but not complete")
 	}
